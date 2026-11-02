@@ -1,0 +1,15 @@
+{
+  "name": "restoration-menu-bench",
+  "private": true,
+  "type": "module",
+  "description": "Restoration plans generated and AC-evaluated in the browser",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build": "node explorer/build.mjs",
+    "test": "node explorer/test_restore.mjs",
+    "serve": "node explorer/serve.mjs"
+  },
+  "dependencies": {
+    "@tellegen/engine": "0.2.0"
+  }
+}

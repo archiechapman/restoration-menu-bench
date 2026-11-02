@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restoration Menu Bench</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ff7a3d'/%3E%3Cpath d='M9 2 4 9h3l-1 5 5-7H8z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --ground: #eef1ef;
+  --surface: #f9faf9;
+  --sunk: #e4e9e6;
+  --ink: #18211e;
+  --muted: #5d6964;
+  --faint: #8a9690;
+  --rule: #cdd5d1;
+  --kv345: #18211e;
+  --kv138: #7c8a84;
+  --accent: #d9480f;
+  --accent-ink: #ffffff;
+  --damage: #b42318;
+  --amber: #b7791f;
+  --violet: #6e56cf;
+  --slot-a: #2563a8;
+  --slot-b: #1f8a6e;
+  --focus: #2563a8;
+  --display: "Archivo Narrow", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --r: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1513; --surface: #161e1b; --sunk: #1d2724; --ink: #e4ebe7; --muted: #9aa8a1;
+    --faint: #6b7a73; --rule: #2c3833; --kv345: #dfe7e3; --kv138: #7f8e87; --accent: #ff7a3d;
+    --accent-ink: #1a0d05; --damage: #f26b5b; --amber: #e0a640; --violet: #a48bfa;
+    --slot-a: #6aa9e0; --slot-b: #4cc39c; --focus: #6aa9e0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1513; --surface: #161e1b; --sunk: #1d2724; --ink: #e4ebe7; --muted: #9aa8a1;
+  --faint: #6b7a73; --rule: #2c3833; --kv345: #dfe7e3; --kv138: #7f8e87; --accent: #ff7a3d;
+  --accent-ink: #1a0d05; --damage: #f26b5b; --amber: #e0a640; --violet: #a48bfa;
+  --slot-a: #6aa9e0; --slot-b: #4cc39c; --focus: #6aa9e0; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font: 14px/1.5 var(--body); padding-inline: var(--s4);
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num, output, dd, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.label {
+  font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.hint { margin: 0; color: var(--muted); font-size: 13px; max-width: 62ch; }
+
+/* ── top bar ─────────────────────────────────────────── */
+.bar {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s3) var(--s5);
+  padding-block: var(--s4) var(--s3); border-bottom: 1px solid var(--rule);
+}
+.bar h1 { font-size: 26px; line-height: 1.1; }
+.bar .case { margin: var(--s1) 0 0; color: var(--muted); font-size: 13px; }
+.bar .case b { color: var(--ink); font-weight: 500; }
+.engines { display: flex; gap: var(--s3); flex-wrap: wrap; }
+.lamp { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.lamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.lamp[data-state="ready"]::before { background: var(--slot-b); }
+.lamp[data-state="busy"]::before { background: var(--accent); animation: blink 1s steps(2) infinite; }
+.lamp[data-state="error"]::before { background: var(--damage); }
+@keyframes blink { 50% { opacity: 0.25; } }
+
+/* ── desk layout ─────────────────────────────────────── */
+.desk {
+  display: grid; grid-template-columns: minmax(280px, 320px) minmax(0, 1fr); gap: var(--s5);
+  padding-block: var(--s4) var(--s6);
+}
+@media (max-width: 980px) { .desk { grid-template-columns: minmax(0, 1fr); } }
+.rail { display: flex; flex-direction: column; gap: var(--s5); min-width: 0; }
+.bench { display: flex; flex-direction: column; gap: var(--s4); min-width: 0; }
+
+/* ── generator ───────────────────────────────────────── */
+.gen { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s4); display: grid; gap: var(--s3); }
+.gen h2 { font-size: 18px; }
+.field { display: grid; gap: var(--s1); }
+.field-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); }
+.field input[type="range"] { width: 100%; accent-color: var(--accent); }
+.field select { background: var(--ground); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 6px; }
+.gen-actions { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.btn { border: 1px solid var(--rule); background: var(--ground); border-radius: 4px; padding: 7px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: 0.5; cursor: progress; }
+.status { font-size: 13px; min-height: 1.5em; }
+.status .clock { font-family: var(--mono); color: var(--accent); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 12px; color: var(--muted); max-height: 9.5em; overflow-y: auto; }
+.log li { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.log li:first-child { color: var(--ink); }
+.engine-note { font-size: 12px; color: var(--faint); margin: 0; }
+
+/* ── library ─────────────────────────────────────────── */
+.library { display: grid; gap: var(--s3); }
+.library.drop-files { outline: 2px dashed var(--accent); outline-offset: 6px; border-radius: var(--r); }
+.lib-head { display: flex; align-items: baseline; justify-content: space-between; }
+.lib-head h2 { font-size: 18px; }
+.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r);
+  padding: var(--s3); display: grid; gap: var(--s2); cursor: grab;
+}
+.card:active { cursor: grabbing; }
+.card[data-slot="0"] { border-color: var(--slot-a); box-shadow: inset 3px 0 0 var(--slot-a); }
+.card[data-slot="1"] { border-color: var(--slot-b); box-shadow: inset 3px 0 0 var(--slot-b); }
+.card-top { display: flex; align-items: center; gap: var(--s2); }
+.card-top strong { font-family: var(--display); font-size: 16px; font-weight: 600; }
+.card-top .where { margin-left: auto; font-family: var(--display); font-weight: 700; font-size: 13px; }
+.chip { font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; background: var(--sunk); color: var(--muted); }
+.chip.generated { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.chip.dropped { background: color-mix(in srgb, var(--violet) 16%, transparent); color: var(--violet); }
+.card-body { display: grid; grid-template-columns: 96px 1fr; gap: var(--s3); align-items: center; }
+.spark { width: 96px; height: 34px; display: block; }
+.stats { margin: 0; display: grid; gap: 1px; font-size: 12px; }
+.stats div { display: flex; justify-content: space-between; gap: var(--s2); }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; }
+.badges { display: flex; flex-wrap: wrap; gap: 4px; }
+.badge { font-size: 11px; padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; }
+.badge.amber { color: var(--amber); }
+.badge.violet { color: var(--violet); }
+.badge.plain { color: var(--muted); }
+.card-actions { display: flex; gap: var(--s2); }
+.card-actions .btn { padding: 3px 10px; font-size: 12px; }
+.progress { height: 3px; background: var(--sunk); border-radius: 2px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); transition: width 0.2s; }
+
+/* ── period scrubber ─────────────────────────────────── */
+.scrubber {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--ground);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4);
+  padding-block: var(--s2); border-bottom: 1px solid var(--rule);
+}
+.periods { display: flex; flex-wrap: wrap; gap: 2px; }
+.periods button {
+  width: 34px; padding: 5px 0; border: 1px solid var(--rule); background: var(--surface); cursor: pointer;
+  font-family: var(--mono); font-size: 13px; border-radius: 3px;
+}
+.periods button[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.period-caption { font-size: 13px; color: var(--muted); }
+.period-caption b { color: var(--ink); font-weight: 600; }
+
+/* ── slots ───────────────────────────────────────────── */
+.slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
+@media (max-width: 760px) { .slots { grid-template-columns: minmax(0, 1fr); } }
+.slot { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s3); display: grid; gap: var(--s2); align-content: start; min-width: 0; }
+.slot.over { outline: 2px dashed var(--accent); outline-offset: 3px; }
+.slot-head { display: flex; gap: var(--s3); align-items: center; }
+.slot-letter { font-family: var(--display); font-weight: 700; font-size: 22px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 4px; color: var(--surface); }
+.slot[data-slot="0"] .slot-letter { background: var(--slot-a); }
+.slot[data-slot="1"] .slot-letter { background: var(--slot-b); }
+.slot-head h3 { font-size: 18px; }
+.slot-head p { margin: 0; font-size: 12px; color: var(--muted); }
+.map { width: 100%; height: auto; display: block; aspect-ratio: 1000 / 760; background: var(--ground); border-radius: 4px; }
+.empty { display: grid; place-items: center; aspect-ratio: 1000 / 760; border: 2px dashed var(--rule); border-radius: 4px; color: var(--muted); text-align: center; padding: var(--s4); }
+.readout { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s2); }
+@media (max-width: 1200px) { .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.readout div { background: var(--ground); border-radius: 4px; padding: 6px 8px; }
+.readout dt { font-size: 11px; color: var(--muted); font-family: var(--display); letter-spacing: 0.06em; text-transform: uppercase; }
+.readout dd { margin: 0; font-size: 14px; }
+.readout dd small { color: var(--muted); font-size: 11px; }
+.notes { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 13px; }
+.notes li { display: flex; gap: 6px; align-items: baseline; }
+.notes li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 2px; transform: translateY(1px); background: var(--faint); }
+.notes li.repair::before { background: var(--accent); }
+.notes li.reactive-limited::before { background: var(--amber); }
+.notes li.shunt-switching::before { background: var(--violet); }
+.notes li.no-ac-point::before { background: var(--damage); }
+
+/* map marks */
+.br { fill: none; stroke-linecap: round; }
+.br.kv345 { stroke: var(--kv345); }
+.br.kv138 { stroke: var(--kv138); }
+.br.dead { stroke: var(--faint); stroke-dasharray: 1 5; stroke-width: 1.6; }
+.br.out { stroke: var(--damage); stroke-dasharray: 7 5; stroke-width: 2; }
+.br.fixed { stroke: var(--accent); stroke-width: 5; }
+.xf { fill: var(--surface); stroke: var(--kv138); stroke-width: 1.3; }
+.bus { stroke-width: 1.5; }
+.bus.live { stroke: var(--ink); fill: var(--ink); }
+.bus.noload { fill: var(--surface); }
+.bus.shed { stroke: var(--damage); }
+.bus.dead { stroke: var(--faint); fill: var(--surface); }
+.gen.out { fill: var(--surface); stroke: var(--damage); stroke-width: 2; }
+.gen.fixed { fill: var(--accent); stroke: var(--accent); }
+.halo { fill: none; stroke: var(--amber); stroke-width: 2.4; }
+.xmark { stroke: var(--damage); stroke-width: 2; }
+
+.key { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: 12px; color: var(--muted); align-items: center; }
+.key span { display: inline-flex; align-items: center; gap: 6px; }
+.key svg { width: 26px; height: 12px; overflow: visible; }
+
+/* ── lower panels ────────────────────────────────────── */
+.lower { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s4); }
+@media (max-width: 1100px) { .lower { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s3) var(--s4); display: grid; gap: var(--s2); align-content: start; min-width: 0; }
+.panel h2 { font-size: 16px; }
+.chart { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .cursor { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.matrix-wrap { overflow-x: auto; }
+.matrix { border-collapse: collapse; font-size: 12px; width: 100%; }
+.matrix th, .matrix td { padding: 2px 3px; text-align: center; }
+.matrix thead th { font-family: var(--mono); font-weight: 400; color: var(--muted); }
+.matrix thead th.now, .matrix td.now { background: var(--sunk); }
+.matrix tbody th { text-align: left; font-weight: 500; white-space: nowrap; padding-right: var(--s2); }
+.matrix tbody th small { color: var(--muted); font-weight: 400; margin-left: 4px; }
+.matrix tr.differs th { color: var(--ink); }
+.matrix tr:not(.differs) th { color: var(--muted); }
+.mk { display: inline-block; width: 11px; height: 11px; border-radius: 50%; vertical-align: middle; }
+.mk.a { background: var(--slot-a); }
+.mk.b { border: 2px solid var(--slot-b); }
+.mk.a.b { background: var(--slot-a); border: 2px solid var(--slot-b); width: 13px; height: 13px; }
+.foot { font-size: 12px; color: var(--faint); margin: 0; max-width: 90ch; }
+.chip { text-transform: none; }
+.label i, .label .sym { text-transform: none; }
+.cards { max-height: 62vh; overflow-y: auto; padding-right: 4px; }
+.credits { font-size: 12px; color: var(--muted); padding: 14px 20px 22px; max-width: 110ch; }
+.credits h2 { font-size: 13px; margin: 0 0 6px; color: var(--ink); }
+.credits p { margin: 0 0 6px; }
+.credits a { color: inherit; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="bar">
+  <div>
+    <h1>Restoration Menu Bench</h1>
+    <p class="case"><b>IEEE 118-bus</b> (PGLib v23.07) · storm seed 1 · <b>22 components</b> down in Area 1 · <b>10 repair periods</b> · plans within ε of the best load delivered</p>
+  </div>
+  <div class="engines" aria-label="Engines">
+    <span class="lamp" id="lamp-milp">MILP · microlp (wasm)</span>
+    <span class="lamp" id="lamp-ac">AC · tellegen SOCWR (wasm)</span>
+  </div>
+</header>
+
+<div class="desk">
+  <aside class="rail">
+    <section class="gen" aria-labelledby="gen-h">
+      <h2 id="gen-h">Find an alternative</h2>
+      <p class="hint">A new repair order whose load delivered is within the cost band, and which differs from every plan in the library by at least <i>d</i> repair decisions.</p>
+      <div class="field">
+        <div class="field-row"><label class="label" for="d">Distance <i>d</i></label><output id="d-out" for="d">20 decisions</output></div>
+        <input type="range" id="d" min="2" max="100" step="1" value="20">
+      </div>
+      <div class="field">
+        <div class="field-row"><label class="label" for="eps">Cost band <span class="sym">ε</span></label>
+          <select id="eps">
+            <option value="0">Exactly optimal (ε = 0)</option>
+            <option value="0.005">0.5% of the best</option>
+            <option value="0.01" selected>1% of the best</option>
+            <option value="0.02">2% of the best</option>
+            <option value="0.05">5% of the best</option>
+          </select>
+        </div>
+      </div>
+      <div class="gen-actions">
+        <button class="btn primary" id="go" type="button">Find an alternative</button>
+        <button class="btn" id="more" type="button" hidden>Keep searching</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite">Loading the solver…</div>
+      <ol class="log" id="log" aria-label="Solver log"></ol>
+      <p class="engine-note">The band is anchored on the paper’s proven optimum, z* = 959.59. 15 s per solve and a 1% MIP gap, so a plan may be a good incumbent rather than the best remaining. “No plan left” is a proof about this library; a timeout is not.</p>
+    </section>
+
+    <section class="library" id="library" aria-labelledby="lib-h">
+      <div class="lib-head"><h2 id="lib-h">Plan library</h2><span class="label" id="lib-count"></span></div>
+      <p class="hint">Starts with the paper’s two certified menus. Drag a plan onto bench A or B. Drop a schedule CSV (<span class="mono">component,id,period</span>) here to add your own.</p>
+      <ul class="cards" id="cards"></ul>
+    </section>
+  </aside>
+
+  <main class="bench">
+    <div class="scrubber">
+      <span class="label" id="period-label">Period</span>
+      <div class="periods" id="periods" role="group" aria-labelledby="period-label"></div>
+      <button class="btn" id="play" type="button">Play</button>
+      <span class="period-caption" id="period-caption"></span>
+    </div>
+    <div class="slots" id="slots">
+      <section class="slot" data-slot="0" aria-label="Bench A"></section>
+      <section class="slot" data-slot="1" aria-label="Bench B"></section>
+    </div>
+    <div class="key" aria-label="Map key">
+      <span><svg viewBox="0 0 26 12"><line class="br kv345" x1="1" y1="6" x2="25" y2="6" stroke-width="2.4"/></svg>345 kV</span>
+      <span><svg viewBox="0 0 26 12"><line class="br kv138" x1="1" y1="6" x2="25" y2="6" stroke-width="2.4"/></svg>138 kV · width = loading</span>
+      <span><svg viewBox="0 0 26 12"><line class="br kv138" x1="1" y1="6" x2="25" y2="6" stroke-width="1.5"/><circle class="xf" cx="10" cy="6" r="4"/><circle class="xf" cx="16" cy="6" r="4"/></svg>transformer</span>
+      <span><svg viewBox="0 0 26 12"><line class="br out" x1="1" y1="6" x2="25" y2="6"/></svg>awaiting repair</span>
+      <span><svg viewBox="0 0 26 12"><line class="br fixed" x1="1" y1="6" x2="25" y2="6"/></svg>repaired this period</span>
+      <span><svg viewBox="0 0 26 12"><line class="br dead" x1="1" y1="6" x2="25" y2="6"/></svg>de-energized</span>
+      <span><svg viewBox="0 0 26 12"><circle class="bus live" cx="7" cy="6" r="4.5"/><circle class="bus live shed" cx="19" cy="6" r="4.5" fill-opacity="0.3"/></svg>load served / partly shed</span>
+      <span><svg viewBox="0 0 26 12"><rect class="bus live" x="8" y="1.5" width="9" height="9"/></svg>generator bus</span>
+      <span><svg viewBox="0 0 26 12"><circle class="halo" cx="13" cy="6" r="6.5"/><circle class="bus live" cx="13" cy="6" r="3.5"/></svg>shed only at constant power factor</span>
+    </div>
+    <div class="lower">
+      <section class="panel" aria-labelledby="chart-h">
+        <h2 id="chart-h">Load served, per period</h2>
+        <svg class="chart" id="chart" viewBox="0 0 640 270" role="img" aria-label="Load served per period for the plans on the bench"></svg>
+        <div class="legend" id="legend"></div>
+      </section>
+      <section class="panel" aria-labelledby="matrix-h">
+        <h2 id="matrix-h">Repair schedule</h2>
+        <div class="matrix-wrap" id="matrix"></div>
+      </section>
+    </div>
+    <p class="foot">Upper line: load served with loads free to shed real and reactive power independently (a relaxation, so it can only overstate). Lower line: a real operating point with each load at constant power factor. The paper’s PowerModelsRestoration SOC redispatch (circles, paper plans only) is the published number; this page reports a range because tellegen 0.2 has no AC load shedding. Plans generated here are for exploration and are not results from the paper.</p>
+  </main>
+</div>
+
+<footer class="credits">
+  <h2>Credits</h2>
+  <p>The method and the two paper menus are from A. C. Chapman and M. Glencross, “Generating Alternative Options for Power System Restoration Ordering”, AUPEC 2026.</p>
+  <p><b>AC evaluation:</b> <a href="https://github.com/eigenergy/tellegen">tellegen</a>, by Samuel Talkington and contributors (eigenergy, MIT licence). This page exists because tellegen runs power system models in a browser.</p>
+  <p><b>Solver:</b> <a href="https://github.com/Specy/microlp">microlp</a> (Apache-2.0). <b>Test case:</b> IEEE 118-bus from <a href="https://github.com/power-grid-lib/pglib-opf">PGLib-OPF</a> v23.07 (CC BY 4.0). <b>Restoration model:</b> exported from <a href="https://github.com/lanl-ansi/PowerModelsRestoration.jl">PowerModelsRestoration.jl</a> (Rhodes et al.). The paper’s schedules were solved with HiGHS and evaluated with Ipopt.</p>
+  <p><a href="licenses/NOTICES.txt">Third-party licences</a></p>
+</footer>
+
+<script type="module" src="app.js"></script>

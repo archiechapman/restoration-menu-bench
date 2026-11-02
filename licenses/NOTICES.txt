@@ -1,0 +1,24 @@
+Third-party components in this site
+===================================
+
+tellegen, @tellegen/engine 0.2.0 (WebAssembly and JS bindings)
+  Copyright (c) 2026 Samuel Talkington and contributors. MIT. See tellegen-MIT.txt.
+  https://github.com/eigenergy/tellegen
+
+microlp 0.6.0 (compiled into rop_deflate_bg.wasm)
+  Apache-2.0. See microlp-Apache-2.0.txt. https://github.com/Specy/microlp
+
+Other Rust crates compiled into rop_deflate_bg.wasm, each used under its MIT option where
+offered (dual-licensed MIT or Apache-2.0 unless noted):
+  bumpalo, cfg-if, futures-core, futures-task, futures-util, itoa, js-sys, log,
+  matrixmultiply, memchr (Unlicense or MIT), ndarray, num-complex, num-integer, num-traits,
+  once_cell, pin-project-lite, rawpointer, serde, serde_core, serde_json, slab (MIT, see
+  slab-MIT.txt), smallvec, sprs, wasm-bindgen, web-time, zmij (MIT, see zmij-MIT.txt).
+  The licence text for each is in its crate on https://crates.io.
+
+IEEE 118-bus test case, data/case118.m
+  PGLib-OPF v23.07, https://github.com/power-grid-lib/pglib-opf. Data licensed CC BY 4.0.
+  Its header is unmodified. The restoration model in data/lp.json was derived from this case
+  with PowerModelsRestoration.jl (LANL, BSD-3-Clause).
+
+Fonts (Archivo Narrow, IBM Plex Mono, IBM Plex Sans) load from Google Fonts, SIL OFL 1.1.
