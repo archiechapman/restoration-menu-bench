@@ -5,9 +5,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), "docs");
+const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "docs");
 const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
-                ".wasm": "application/wasm", ".json": "application/json; charset=utf-8", ".m": "text/plain; charset=utf-8" };
+                ".wasm": "application/wasm", ".json": "application/json; charset=utf-8", ".m": "text/plain; charset=utf-8",
+                ".txt": "text/plain; charset=utf-8" };
 const port = +(process.env.PORT ?? 8118);
 
 http.createServer((req, res) => {

@@ -162,7 +162,7 @@ button, select, input { font: inherit; color: inherit; }
 /* ── slots ───────────────────────────────────────────── */
 .slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
 @media (max-width: 760px) { .slots { grid-template-columns: minmax(0, 1fr); } }
-.slot { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s3); display: grid; gap: var(--s2); align-content: start; min-width: 0; }
+.slot { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s3); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s2); align-content: start; min-width: 0; }
 .slot.over { outline: 2px dashed var(--accent); outline-offset: 3px; }
 .slot-head { display: flex; gap: var(--s3); align-items: center; }
 .slot-letter { font-family: var(--display); font-weight: 700; font-size: 22px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 4px; color: var(--surface); }

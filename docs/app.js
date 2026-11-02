@@ -350,7 +350,7 @@ function renderSlots() {
     const t = state.t, e = p.eval?.periods[t];
     const repairs = net.items.filter((_, k) => p.tau[k] === t).map((it) => `${it.label} <small>(${it.detail})</small>`);
     const notes = [];
-    if (repairs.length) notes.push(`<li class="repair">Repaired now: ${repairs.join(", ")}</li>`);
+    if (repairs.length) notes.push(`<li class="repair"><span>Repaired now: ${repairs.join(", ")}</span></li>`);
     else if (t === 0) notes.push(`<li>Before any repair: the storm's damage, all 22 components out.</li>`);
     for (const f of e?.flags ?? []) notes.push(`<li class="${f.kind}">${esc(f.text)}</li>`);
     const nIsl = e?.islands.length ?? 0;
