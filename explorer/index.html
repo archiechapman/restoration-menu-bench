@@ -156,6 +156,10 @@ button, select, input { font: inherit; color: inherit; }
   font-family: var(--mono); font-size: 13px; border-radius: 3px;
 }
 .periods button[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.opts { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.seg { display: inline-flex; gap: 2px; }
+.seg button { padding: 5px 9px; border: 1px solid var(--rule); background: var(--surface); cursor: pointer; font-size: 12px; border-radius: 3px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
 .period-caption { font-size: 13px; color: var(--muted); }
 .period-caption b { color: var(--ink); font-weight: 600; }
 
@@ -203,6 +207,14 @@ button, select, input { font: inherit; color: inherit; }
 .gen.fixed { fill: var(--accent); stroke: var(--accent); }
 .halo { fill: none; stroke: var(--amber); stroke-width: 2.4; }
 .xmark { stroke: var(--damage); stroke-width: 2; }
+/* State changes (repaired, energized, shedding) fade rather than snap; widths and shading are
+   blended by the playhead itself. Stepped motion turns the fades off. */
+.map .br { transition: stroke 0.35s; }
+.map .bus, .map .gen { transition: fill 0.35s, stroke 0.35s; }
+.calm .map .br, .calm .map .bus, .calm .map .gen { transition: none; }
+.chart { cursor: ew-resize; touch-action: pan-y; user-select: none; }
+.matrix th, .matrix td { transition: background-color 0.2s; }
+.calm .matrix th, .calm .matrix td { transition: none; }
 
 .key { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: 12px; color: var(--muted); align-items: center; }
 .key span { display: inline-flex; align-items: center; gap: 6px; }
@@ -295,6 +307,12 @@ button, select, input { font: inherit; color: inherit; }
       <span class="label" id="period-label">Period</span>
       <div class="periods" id="periods" role="group" aria-labelledby="period-label"></div>
       <button class="btn" id="play" type="button">Play</button>
+      <span class="opts">
+        <span class="label" id="speed-label">Speed</span>
+        <span class="seg" id="speed" role="group" aria-labelledby="speed-label"><button type="button" data-r="0.5">Slow</button><button type="button" data-r="1">Normal</button><button type="button" data-r="2">Fast</button></span>
+        <span class="label" id="motion-label">Motion</span>
+        <span class="seg" id="motion" role="group" aria-labelledby="motion-label"><button type="button" data-m="smooth">Smooth</button><button type="button" data-m="step">Stepped</button></span>
+      </span>
       <span class="period-caption" id="period-caption"></span>
     </div>
     <div class="slots" id="slots">
@@ -315,6 +333,7 @@ button, select, input { font: inherit; color: inherit; }
     <div class="lower">
       <section class="panel" aria-labelledby="chart-h">
         <h2 id="chart-h">Load served, per period</h2>
+        <p class="hint">Drag across the chart to move through the periods.</p>
         <svg class="chart" id="chart" viewBox="0 0 640 270" role="img" aria-label="Load served per period for the plans on the bench"></svg>
         <div class="legend" id="legend"></div>
       </section>
